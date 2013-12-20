@@ -13,6 +13,8 @@ extern "C" {
 #endif
 
     void initPWM1( void );
+    char setMotorsSpeed( const int16_t, const int16_t, const char );
+    void stopMotors( void );
 
 
 #ifdef	__cplusplus

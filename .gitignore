@@ -1,0 +1,5 @@
+*.o.d
+*.o
+newAsser.X/build/*
+newAsser.X/dist/*
+*~

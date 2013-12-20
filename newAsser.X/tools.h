@@ -12,9 +12,13 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+
     void turnONDebugLed( void );
     void turnOFFDebugLed( void );
     void toggleDebugLed( void );
+    void blockPauseMs( const uint16_t );
+    void blockPauseS( const uint16_t );
 
 
 #ifdef	__cplusplus
