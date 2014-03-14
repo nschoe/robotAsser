@@ -19,7 +19,7 @@ extern "C" {
     void toggleDebugLed( void );
     void blockPauseMs( const uint16_t );
     void blockPauseS( const uint16_t );
-
+    int16_t abs( const int16_t );
 
 #ifdef	__cplusplus
 }

@@ -14,7 +14,8 @@
 #include "constants.h"
 #include "timers.h"
 
-extern unsigned char g_FunctionTimer23; // defiend in main.c
+extern unsigned char g_FunctionTimer23; // defined in main.c
+extern char g_PauseBlock; // defined in main.c
 
 /*
  * The debug led is on RB5 which is in PORTB
@@ -37,9 +38,10 @@ void toggleDebugLed( void )
 // Pause for nbMiliseconds miliseconds, blocking function
 void blockPauseMs( const uint16_t nbMiliseconds )
 {
+        g_PauseBlock = TRUE;
 	g_FunctionTimer23 = FUNCTION_BLOCKING;
 	startTimer23( nbMiliseconds );
-	while( 0 == IFS0bits.T3IF );
+	while( TRUE == g_PauseBlock );
 }
 
 void blockPauseS( const uint16_t nbSeconds )
@@ -50,4 +52,13 @@ void blockPauseS( const uint16_t nbSeconds )
 	{
 		blockPauseMs( 1000 );
 	}
+}
+
+// Absolute value
+int16_t abs( const int16_t x )
+{
+    if( x < 0 )
+        return( -x );
+    else
+        return( x );
 }

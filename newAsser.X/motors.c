@@ -274,6 +274,8 @@ void stopMotors( void )
 {
 	PWM1CON1bits.PEN1L = 0; // deactivate PWM1 output
 	PWM1CON1bits.PEN1H = 0; // idem
+        PWM1CON1bits.PEN2L = 0; // deactivate PWM1 output
+	PWM1CON1bits.PEN2H = 0; // idem
 	P1DC1 = 0;
 	P1DC2 = 0;
 }

@@ -21,4 +21,8 @@ void initIO( void )
 {
   // Initialize the debug led as output
   TRISB = 0b11001111; // Debug Led (RB5) and Motor Enable (RB4) in output mode
+
+  // Enable remapable pins as input : QEI pins
+  TRISBbits.TRISB10 = 0b1;
+  TRISBbits.TRISB11 = 0b1;
 }
