@@ -54,15 +54,14 @@ unsigned char asser()
         // Reset asser loop number
         g_Loop = 0;
 
-        //*
+        // TO DO : moving regulation
+        
         speedCor = (int16_t) ((K_I * (g_RightSpeed - g_LeftSpeed) + K *((1 + K_D) * (g_Cons_Alpha - alpha) - K_D * (g_Cons_Alpha - g_Alpha_Last)))/(1 + K_I));
-        g_LeftSpeed = - speedCor / 2; //speedRamp( 0 - speedCor / 2, g_LeftSpeed );
-        g_RightSpeed = speedCor / 2; //speedRamp( 0 + speedCor / 2, g_RightSpeed );
+        g_LeftSpeed = (int16_t) (400 - speedCor / 2); //speedRamp( 0 - speedCor / 2, g_LeftSpeed );
+        g_RightSpeed = (int16_t) (400 + speedCor / 2); //speedRamp( 0 + speedCor / 2, g_RightSpeed );
 
         // We just did a correction, so we update g_Alpha_Last
         g_Alpha_Last = alpha;
-
-        //*/
     }
     setMotorsSpeed(g_LeftSpeed, g_RightSpeed, MOTOR_MODE_PERCENTAGE );
 

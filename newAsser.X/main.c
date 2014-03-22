@@ -59,6 +59,9 @@ int main ( void )
         g_LeftSpeed = 0;
         g_RightSpeed = 0;
 
+        g_DistL = 0;
+        g_DistR = 0;
+
         // No new order at the beginning
         g_NewOrder = FALSE;
 
@@ -88,7 +91,7 @@ int main ( void )
 
                     // Effectively send the DONE_ASSER to PSoC
                     stopMotors(); // For tests only
-                    g_END = TRUE; // For tests onyl
+                    //g_END = TRUE; // For tests only
                 }
             }
         }
