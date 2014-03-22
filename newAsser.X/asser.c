@@ -20,64 +20,65 @@
 #include "constants.h"
 #include "tools.h"
 #include "motors.h"
+#include "math.h"
 
 // Defined in main.gc
-extern int32_t g_DistL;
-extern int32_t g_DistR;
+extern int32_t g_DistL, g_DistR;
 extern uint32_t g_Loop;
-extern int16_t g_OldLeftSpeed, g_OldRightSpeed;
-extern uint32_t g_Cons_Alpha, g_Alpha;
+extern int16_t g_LeftSpeed, g_RightSpeed;
+extern uint32_t g_X, g_Y, g_Alpha, g_Cons_X, g_Cons_Y, g_Cons_Alpha;
+extern uint32_t g_Alpha_Last;
 
 /*
  * Asser main loop function
  */
 unsigned char asser()
 {
-    int32_t ticksL, ticksR, rAlpha, errAlpha;
-    int16_t deltaTicks, newSpeedL, newSpeedR;
-
-    uint32_t alpha;
+    int16_t speedCor;
+    uint32_t alpha, d;
+    uint32_t dX, dY;
 
     // Increment asser loop number
     g_Loop++;
 
+    // Position calculation
+    alpha = ((g_DistR - g_DistL) * TICKS_PER_ROTATION + POS2CNT - POS1CNT) * ANGLE_PER_TICK;
+    //d = ((g_DistR + g_DistL) * TICKS_PER_ROTATION + POS2CNT + POS1CNT) * DIST_PER_TICK / 2;
+
+    //dY = (uint32_t) d * sin ( (alpha + g_Alpha) / 2 );
+    //dX = (uint32_t) d * cos ( (alpha + g_Alpha) / 2 );
+
+    // Speed regulation
     if( g_Loop >= 1000 )
     {
         // Reset asser loop number
         g_Loop = 0;
 
-        // Test of the ramp speed
-        //newSpeedL = speedRamp( cSpeedL, g_OldLeftSpeed );
-        //newSpeedR = speedRamp( cSpeedR, g_OldRightSpeed );
+        //*
+        speedCor = (int16_t) ((K_I * (g_RightSpeed - g_LeftSpeed) + K *((1 + K_D) * (g_Cons_Alpha - alpha) - K_D * (g_Cons_Alpha - g_Alpha_Last)))/(1 + K_I));
+        g_LeftSpeed = - speedCor / 2; //speedRamp( 0 - speedCor / 2, g_LeftSpeed );
+        g_RightSpeed = speedCor / 2; //speedRamp( 0 + speedCor / 2, g_RightSpeed );
 
-        // Update previous speed values
-        //g_OldLeftSpeed = newSpeedL;
-        //g_OldRightSpeed = newSpeedR;
+        // We just did a correction, so we update g_Alpha_Last
+        g_Alpha_Last = alpha;
 
-        //setMotorsSpeed( newSpeedL, newSpeedR, MOTOR_MODE_PERCENTAGE );
-
-        setMotorsSpeed( 400, -400, MOTOR_MODE_PERCENTAGE );
-        /*
-        ticksL = g_DistL * TICKS_PER_ROTATION + POS1CNT;
-        ticksR = g_DistR * TICKS_PER_ROTATION + POS2CNT;
-        deltaTicks = ticksR - ticksL; // trigonometric rotation -> right - left
-        
-        rAlpha = ANGLE_PER_TICK * deltaTicks;
-
-        errAlpha = cAlpha - rAlpha; // in mili-degrees
-
-        *comS = errAlpha / K;
-
-        setMotorsSpeed( cSpeedL - (*comS / 2 ), cSpeedR + (*comS / 2), MOTOR_MODE_PERCENTAGE );
-        */
+        //*/
     }
+    setMotorsSpeed(g_LeftSpeed, g_RightSpeed, MOTOR_MODE_PERCENTAGE );
 
-    alpha = ((g_DistR - g_DistL) * TICKS_PER_ROTATION + POS2CNT - POS1CNT) * ANGLE_PER_TICK;
 
-    if( alpha == g_Cons_Alpha )
-        return( END_ASSER );
+    // Really update position
+    //g_X += dX;
+    //g_Y += dY;
+    g_Alpha = alpha;
+
+
+    //*
+    if( g_Alpha >= g_Cons_Alpha )
+        return( DONE_ASSER );
     else
         return( ASSER_RUNNING );
+    //*/
 }
 
 /*
