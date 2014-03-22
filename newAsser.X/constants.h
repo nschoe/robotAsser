@@ -11,6 +11,9 @@
  *
  * February, 6
  * Tuned the coefficients of the speed ramp
+ *
+ * March, 20
+ * Implemented the functions to update the (X, Y, alpha) position
  */
 
 #ifndef CONSTANTS_H
@@ -56,11 +59,16 @@ extern "C" {
 #define ASSER_RUNNING 1
 #define END_ASSER 2
 
-#define DIAM_ENCODER 41 // Diameter (mm) of the rotary encoders
-#define DIST_WHEELS 235 // The distance (mm) between the rotary encoders
-#define ANGLE_PER_TICK 22 // For a 1 tick difference between wheels, it represents 22 milidegrees orientation
+#define PI 3.141592
+
+#define DIAM_ENCODER 41100 // Diameter (um) of the rotary encoders
+#define DIST_WHEELS 247000 // The distance (um) between the rotary encoders
+#define ANGLE_PER_TICK 21 // For a 1 tick difference between wheels, it represents 22 milidegrees orientation
+#define DIST_PER_TICK // Distance the robot moves when the rotsry encoders move for 1 tick
 
 #define K 11
+#define K_D 0
+#define K_I 5
 
     /************************************************************* SPEED RAMP */
 #define ACCELERATION_MAX 10 // 1%

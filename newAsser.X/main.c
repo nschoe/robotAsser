@@ -26,11 +26,14 @@
 
 // Global variables (TO BE LIMITED IN NUMBER)
 unsigned char g_FunctionTimer23;
-int32_t g_DistL, g_DistR; // Distance traveled by left and right wheel
+int32_t g_DistL, g_DistR;// Distance traveled by left and right wheel
+int32_t g_DistL_Last, g_DistR_Last;
+int32_t g_NbTicksL_Last, g_NbTicksR_Last;
 char g_PauseBlock; // Used for the blocking pause functions
 char g_END;
 uint32_t g_Loop;
-int16_t g_OldLeftSpeed, g_OldRightSpeed;
+int16_t g_LeftSpeed, g_RightSpeed, g_CommLeftSpeed, g_CommRighSpeed;
+uint32_t g_X, g_Y, g_Alpha, g_Cons_X, g_Cons_Y, g_Cons_Alpha;
 
 // Interupts functions are defined at the end of the file
 
@@ -50,15 +53,16 @@ int main ( void )
         comS = 0;
 
         // Set previous speed values to 0
-        g_OldLeftSpeed = 0;
-        g_OldRightSpeed = 0;
+        g_LeftSpeed = 0;
+        g_RightSpeed = 0;
         
         blockPauseS( 1 );
 
         g_FunctionTimer23 = FUNCTION_STOP;
         startTimer23( 12000 );
 
-        while( !g_END && (asser( 800, 800, &comS, 0 ) != END_ASSER) );
+        g_Cons_Alpha = 180000;
+        while( !g_END && (asser() != END_ASSER) );
         stopMotors();
 
         while( 1 );

@@ -26,14 +26,17 @@ extern int32_t g_DistL;
 extern int32_t g_DistR;
 extern uint32_t g_Loop;
 extern int16_t g_OldLeftSpeed, g_OldRightSpeed;
+extern uint32_t g_Cons_Alpha, g_Alpha;
 
 /*
  * Asser main loop function
  */
-unsigned char asser( const int16_t cSpeedL, const int16_t cSpeedR, int32_t * comS, const int32_t cAlpha )
+unsigned char asser()
 {
     int32_t ticksL, ticksR, rAlpha, errAlpha;
     int16_t deltaTicks, newSpeedL, newSpeedR;
+
+    uint32_t alpha;
 
     // Increment asser loop number
     g_Loop++;
@@ -44,15 +47,16 @@ unsigned char asser( const int16_t cSpeedL, const int16_t cSpeedR, int32_t * com
         g_Loop = 0;
 
         // Test of the ramp speed
-        newSpeedL = speedRamp( cSpeedL, g_OldLeftSpeed );
-        newSpeedR = speedRamp( cSpeedR, g_OldRightSpeed );
+        //newSpeedL = speedRamp( cSpeedL, g_OldLeftSpeed );
+        //newSpeedR = speedRamp( cSpeedR, g_OldRightSpeed );
 
         // Update previous speed values
-        g_OldLeftSpeed = newSpeedL;
-        g_OldRightSpeed = newSpeedR;
+        //g_OldLeftSpeed = newSpeedL;
+        //g_OldRightSpeed = newSpeedR;
 
-        setMotorsSpeed( newSpeedL, newSpeedR, MOTOR_MODE_PERCENTAGE );
+        //setMotorsSpeed( newSpeedL, newSpeedR, MOTOR_MODE_PERCENTAGE );
 
+        setMotorsSpeed( 400, -400, MOTOR_MODE_PERCENTAGE );
         /*
         ticksL = g_DistL * TICKS_PER_ROTATION + POS1CNT;
         ticksR = g_DistR * TICKS_PER_ROTATION + POS2CNT;
@@ -68,7 +72,12 @@ unsigned char asser( const int16_t cSpeedL, const int16_t cSpeedR, int32_t * com
         */
     }
 
-    return( ASSER_RUNNING );
+    alpha = ((g_DistR - g_DistL) * TICKS_PER_ROTATION + POS2CNT - POS1CNT) * ANGLE_PER_TICK;
+
+    if( alpha == g_Cons_Alpha )
+        return( END_ASSER );
+    else
+        return( ASSER_RUNNING );
 }
 
 /*

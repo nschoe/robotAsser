@@ -19,7 +19,7 @@ extern "C" {
 
     void initQEI( void );
     void initAsser( void );
-    unsigned char asser( const int16_t, const int16_t, int32_t *, const int32_t );
+    unsigned char asser();
     int16_t speedRamp( const int16_t, const int16_t );
 
 

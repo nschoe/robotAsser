@@ -1,5 +1,3 @@
-*.o.d
-*.o
-newAsser.X/build/default/production/*.o
+newAsser.X/build/*
 newAsser.X/dist/*
-*~
+newAsser.X/nbproject/*
