@@ -27,19 +27,23 @@
 // Global variables (TO BE LIMITED IN NUMBER)
 unsigned char g_FunctionTimer23;
 int32_t g_DistL, g_DistR;// Distance traveled by left and right wheel
-int32_t g_DistL_Last, g_DistR_Last;
-int32_t g_NbTicksL_Last, g_NbTicksR_Last;
 char g_PauseBlock; // Used for the blocking pause functions
 char g_END;
+char g_NewOrder; // Set to 1 when received a new order from the PSoC (prevents repeated send of DONE_ASSER)
 uint32_t g_Loop;
-int16_t g_LeftSpeed, g_RightSpeed, g_CommLeftSpeed, g_CommRighSpeed;
+int16_t g_LeftSpeed, g_RightSpeed;
 uint32_t g_X, g_Y, g_Alpha, g_Cons_X, g_Cons_Y, g_Cons_Alpha;
+uint32_t g_Alpha_Last; // Alpha value when last correction was computed
 
 // Interupts functions are defined at the end of the file
 
 int main ( void )
 {
-    int32_t comS;
+    /*
+     TO DO
+     =====
+     * Set up another timer than 2-3 for blocking pause functions
+     */
 
 	initIO( );
         initAsser( );
@@ -49,20 +53,47 @@ int main ( void )
 
         g_PauseBlock = FALSE;
         g_END = FALSE;
-        g_Loop = 0;
-        comS = 0;
+        g_Loop = 1001;
 
         // Set previous speed values to 0
         g_LeftSpeed = 0;
         g_RightSpeed = 0;
+
+        // No new order at the beginning
+        g_NewOrder = FALSE;
+
+        // No previous correction
+        g_Alpha_Last = 0; // Start facing EAST
         
         blockPauseS( 1 );
 
-        g_FunctionTimer23 = FUNCTION_STOP;
-        startTimer23( 12000 );
+        //g_FunctionTimer23 = FUNCTION_STOP;
+        //startTimer23( 12000 ); // In match : should be 90 000
+
+        //setMotorsSpeed(600, 600, MOTOR_MODE_PERCENTAGE);
+        //while(1);
 
         g_Cons_Alpha = 180000;
-        while( !g_END && (asser() != END_ASSER) );
+
+        g_NewOrder = TRUE; // TEST
+        
+        while ( !g_END ) // 90 seconds not finished
+        {
+            if ( asser() == DONE_ASSER ) // We finished executing the order
+            {
+                // Send DONE_ASSER to PSoC
+                if ( g_NewOrder ) // If the asser is done and it was a new order
+                {
+                    g_NewOrder = FALSE;
+
+                    // Effectively send the DONE_ASSER to PSoC
+                    stopMotors(); // For tests only
+                    g_END = TRUE; // For tests onyl
+                }
+            }
+        }
+
+        // After 90 seconds, everything must be stopped
         stopMotors();
 
         while( 1 );

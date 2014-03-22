@@ -57,18 +57,18 @@ extern "C" {
 
     /********************************************************* ASSER CONTANTS */
 #define ASSER_RUNNING 1
-#define END_ASSER 2
+#define DONE_ASSER 0x0D // 0D is 'DO' reversed
 
 #define PI 3.141592
 
 #define DIAM_ENCODER 41100 // Diameter (um) of the rotary encoders
-#define DIST_WHEELS 247000 // The distance (um) between the rotary encoders
-#define ANGLE_PER_TICK 21 // For a 1 tick difference between wheels, it represents 22 milidegrees orientation
-#define DIST_PER_TICK // Distance the robot moves when the rotsry encoders move for 1 tick
+#define DIST_WHEELS 247000 // Distance (um) between the rotary encoders
+#define ANGLE_PER_TICK 21 // Angle (m°) done by the robot for 1 tick difference between wheels
+#define DIST_PER_TICK 90 // Distance (um) the robot moves when the rotary encoders move for 1 tick
 
-#define K 11
-#define K_D 0
-#define K_I 5
+#define K 1
+#define K_D 5
+#define K_I 1
 
     /************************************************************* SPEED RAMP */
 #define ACCELERATION_MAX 10 // 1%
