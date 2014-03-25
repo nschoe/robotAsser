@@ -26,7 +26,8 @@
 
 // Global variables (TO BE LIMITED IN NUMBER)
 unsigned char g_FunctionTimer23;
-int32_t g_DistL, g_DistR;// Distance traveled by left and right wheel
+int32_t g_DistL, g_DistR;// Distance traveled by left and right wheel (number of rotations)
+int32_t g_Dist_Last, g_POS_Last; // Distance traveled at last position calculation (number of rotations, number of ticks)
 char g_PauseBlock; // Used for the blocking pause functions
 char g_END;
 char g_NewOrder; // Set to 1 when received a new order from the PSoC (prevents repeated send of DONE_ASSER)
@@ -68,6 +69,9 @@ int main ( void )
         // No previous correction
         g_Alpha_Last = 0; // Start facing EAST
         
+        // Define start position
+        g_Alpha = 0;
+        
         blockPauseS( 1 );
 
         //g_FunctionTimer23 = FUNCTION_STOP;
@@ -91,7 +95,7 @@ int main ( void )
 
                     // Effectively send the DONE_ASSER to PSoC
                     stopMotors(); // For tests only
-                    //g_END = TRUE; // For tests only
+                    g_END = TRUE; // For tests only
                 }
             }
         }

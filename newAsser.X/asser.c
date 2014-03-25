@@ -24,6 +24,7 @@
 
 // Defined in main.gc
 extern int32_t g_DistL, g_DistR;
+extern int32_t g_Dist_Last, g_POS_Last;
 extern uint32_t g_Loop;
 extern int16_t g_LeftSpeed, g_RightSpeed;
 extern uint32_t g_X, g_Y, g_Alpha, g_Cons_X, g_Cons_Y, g_Cons_Alpha;
@@ -34,19 +35,30 @@ extern uint32_t g_Alpha_Last;
  */
 unsigned char asser()
 {
-    int16_t speedCor;
-    uint32_t alpha, d;
+    int16_t commonSpeed, speedCor;
+    uint32_t alpha, d, targetAlpha, distToTarget;
     uint32_t dX, dY;
+    int32_t newDist, newPOS;
 
     // Increment asser loop number
     g_Loop++;
 
     // Position calculation
+    newDist = (g_DistR + g_DistL) / 2;
+    newPOS = (POS2CNT + POS1CNT) / 2;
     alpha = ((g_DistR - g_DistL) * TICKS_PER_ROTATION + POS2CNT - POS1CNT) * ANGLE_PER_TICK;
-    //d = ((g_DistR + g_DistL) * TICKS_PER_ROTATION + POS2CNT + POS1CNT) * DIST_PER_TICK / 2;
+    /*d = ((newDist - g_Dist_Last) * TICKS_PER_ROTATION + newPOS - g_POS_Last) * DIST_PER_TICK;
 
-    //dY = (uint32_t) d * sin ( (alpha + g_Alpha) / 2 );
-    //dX = (uint32_t) d * cos ( (alpha + g_Alpha) / 2 );
+    dY = (int32_t) d * sin ( (alpha + g_Alpha) / 2 );
+    dX = (int32_t) d * cos ( (alpha + g_Alpha) / 2 );
+
+    // Really update position
+    g_X += dX;
+    g_Y += dY;*/
+    g_Alpha = alpha;
+
+    /*g_Dist_Last = newDist;
+    g_POS_Last = newPOS;*/
 
     // Speed regulation
     if( g_Loop >= 1000 )
@@ -54,24 +66,21 @@ unsigned char asser()
         // Reset asser loop number
         g_Loop = 0;
 
-        // TO DO : moving regulation
-        
-        speedCor = (int16_t) ((K_I * (g_RightSpeed - g_LeftSpeed) + K *((1 + K_D) * (g_Cons_Alpha - alpha) - K_D * (g_Cons_Alpha - g_Alpha_Last)))/(1 + K_I));
-        g_LeftSpeed = (int16_t) (400 - speedCor / 2); //speedRamp( 0 - speedCor / 2, g_LeftSpeed );
-        g_RightSpeed = (int16_t) (400 + speedCor / 2); //speedRamp( 0 + speedCor / 2, g_RightSpeed );
+        // TO DO : distance and angle to target calculation
+        targetAlpha = g_Cons_Alpha;
+        //commonSpeed = (int16_t) (K_V * distToTarget);
+        commonSpeed = 600;
+        speedCor = (int16_t) ((K_I * (g_RightSpeed - g_LeftSpeed) + K * ((1 + K_D) * (targetAlpha - alpha) - K_D * (targetAlpha - g_Alpha_Last)))/(1 + K_I));
+
+        g_LeftSpeed = (int16_t) (commonSpeed - speedCor / 2); //speedRamp( commonSpeed - speedCor / 2, g_LeftSpeed );
+        g_RightSpeed = (int16_t) (commonSpeed  + speedCor / 2); //speedRamp( commonSpeed  + speedCor / 2, g_RightSpeed );
 
         // We just did a correction, so we update g_Alpha_Last
         g_Alpha_Last = alpha;
     }
     setMotorsSpeed(g_LeftSpeed, g_RightSpeed, MOTOR_MODE_PERCENTAGE );
 
-
-    // Really update position
-    //g_X += dX;
-    //g_Y += dY;
-    g_Alpha = alpha;
-
-
+    // TO DO : goal complete return
     //*
     if( g_Alpha >= g_Cons_Alpha )
         return( DONE_ASSER );
