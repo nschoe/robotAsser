@@ -18,7 +18,8 @@
 #include "configurationBits.h"
 #include "constants.h"
 #include "tools.h"
-
+#include "fifo.h"
+#include "uart.h"
 #include "timers.h"
 #include "motors.h"
 #include "io.h"
@@ -33,8 +34,9 @@ char g_END;
 char g_NewOrder; // Set to 1 when received a new order from the PSoC (prevents repeated send of DONE_ASSER)
 uint32_t g_Loop;
 int16_t g_LeftSpeed, g_RightSpeed;
-uint32_t g_X, g_Y, g_Alpha, g_Cons_X, g_Cons_Y, g_Cons_Alpha;
-uint32_t g_Alpha_Last; // Alpha value when last correction was computed
+uint32_t g_X, g_Y, g_Cons_X, g_Cons_Y;
+int32_t g_Alpha, g_Cons_Alpha, g_Alpha_Last; // Alpha value when last correction was computed
+fifo * g_UART_Buffer;
 
 // Interupts functions are defined at the end of the file
 
@@ -51,6 +53,15 @@ int main ( void )
 	initTimer23( );
 	initPWM1( );
         initQEI( );
+
+        init_uart();
+
+
+
+        /*while (1) {
+            UART_send_32 ( 0xFF000000 );
+            blockPauseS ( 1 );
+        }*/
 
         g_PauseBlock = FALSE;
         g_END = FALSE;
@@ -80,7 +91,7 @@ int main ( void )
         //setMotorsSpeed(600, 600, MOTOR_MODE_PERCENTAGE);
         //while(1);
 
-        g_Cons_Alpha = 180000;
+        g_Cons_Alpha = 0;
 
         g_NewOrder = TRUE; // TEST
         
@@ -164,4 +175,9 @@ void __attribute__( ( __interrupt__, no_auto_psv ) ) _QEI2Interrupt( void )
         g_DistR++;
     else
         g_DistR--;
+}
+
+void __attribute__((__interrupt__, no_auto_psv)) _U1TXInterrupt(void)
+{
+    IFS0bits.U1TXIF = 0; // clear TX interrupt flag
 }

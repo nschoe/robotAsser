@@ -11,6 +11,8 @@
       <itemPath>timers.h</itemPath>
       <itemPath>io.h</itemPath>
       <itemPath>asser.h</itemPath>
+      <itemPath>uart.h</itemPath>
+      <itemPath>fifo.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -25,6 +27,8 @@
       <itemPath>timers.c</itemPath>
       <itemPath>io.c</itemPath>
       <itemPath>asser.c</itemPath>
+      <itemPath>uart.c</itemPath>
+      <itemPath>fifo.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

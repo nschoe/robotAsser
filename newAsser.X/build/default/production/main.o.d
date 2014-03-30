@@ -3,6 +3,8 @@ main.c  \
 configurationBits.h  \
 constants.h  \
  tools.h  \
+fifo.h  \
+uart.h  \
 timers.h  \
 motors.h  \
 io.h  \

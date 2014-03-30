@@ -27,8 +27,8 @@ extern int32_t g_DistL, g_DistR;
 extern int32_t g_Dist_Last, g_POS_Last;
 extern uint32_t g_Loop;
 extern int16_t g_LeftSpeed, g_RightSpeed;
-extern uint32_t g_X, g_Y, g_Alpha, g_Cons_X, g_Cons_Y, g_Cons_Alpha;
-extern uint32_t g_Alpha_Last;
+extern uint32_t g_X, g_Y, g_Cons_X, g_Cons_Y;
+extern int32_t g_Alpha, g_Cons_Alpha, g_Alpha_Last;
 
 /*
  * Asser main loop function
@@ -36,8 +36,8 @@ extern uint32_t g_Alpha_Last;
 unsigned char asser()
 {
     int16_t commonSpeed, speedCor;
-    uint32_t alpha, d, targetAlpha, distToTarget;
-    uint32_t dX, dY;
+    int32_t alpha, d, targetAlpha, distToTarget;
+    int32_t dX, dY;
     int32_t newDist, newPOS;
 
     // Increment asser loop number
@@ -63,6 +63,9 @@ unsigned char asser()
     // Speed regulation
     if( g_Loop >= 1000 )
     {
+        UART_send_32 ( g_Alpha );
+        blockPauseS( 1 );
+
         // Reset asser loop number
         g_Loop = 0;
 
@@ -71,9 +74,10 @@ unsigned char asser()
         //commonSpeed = (int16_t) (K_V * distToTarget);
         commonSpeed = 600;
         speedCor = (int16_t) ((K_I * (g_RightSpeed - g_LeftSpeed) + K * ((1 + K_D) * (targetAlpha - alpha) - K_D * (targetAlpha - g_Alpha_Last)))/(1 + K_I));
+        //UART_send_32 ( speedCor );
 
-        g_LeftSpeed = (int16_t) (commonSpeed - speedCor / 2); //speedRamp( commonSpeed - speedCor / 2, g_LeftSpeed );
-        g_RightSpeed = (int16_t) (commonSpeed  + speedCor / 2); //speedRamp( commonSpeed  + speedCor / 2, g_RightSpeed );
+        //g_LeftSpeed = commonSpeed - speedCor; //speedRamp( commonSpeed - speedCor, g_LeftSpeed );
+        //g_RightSpeed = commonSpeed  + speedCor; //speedRamp( commonSpeed  + speedCor, g_RightSpeed );
 
         // We just did a correction, so we update g_Alpha_Last
         g_Alpha_Last = alpha;
@@ -82,9 +86,9 @@ unsigned char asser()
 
     // TO DO : goal complete return
     //*
-    if( g_Alpha >= g_Cons_Alpha )
+    /*/if( g_Alpha >= g_Cons_Alpha )
         return( DONE_ASSER );
-    else
+    else*/
         return( ASSER_RUNNING );
     //*/
 }
