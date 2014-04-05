@@ -66,11 +66,15 @@ extern "C" {
 #define ANGLE_PER_TICK 21 // Angle (m°) done by the robot for 1 tick difference between wheels
 #define DIST_PER_TICK 90 // Distance (um) the robot moves when the rotary encoders move for 1 tick
 
-#define K 0.1//0.002
-#define K_D 0
-#define K_I 0
+#define ANGLE_MARGIN 100 //
+#define DIST_MARGIN 100
 
-#define K_V 0.005 // vitesse reduction due to target proximity
+    /******************************************************* ASSER CORRECTION */
+#define K 0.002
+#define K_D 0 // Differential correction
+#define K_I 0.2 // Integral correction
+
+#define K_V 0.005 // Speed reduction due to target proximity
 
     /************************************************************* SPEED RAMP */
 #define ACCELERATION_MAX 10 // 1%

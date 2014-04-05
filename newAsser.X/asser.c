@@ -46,38 +46,44 @@ unsigned char asser()
     // Position calculation
     newDist = (g_DistR + g_DistL) / 2;
     newPOS = (POS2CNT + POS1CNT) / 2;
-    alpha = ((g_DistR - g_DistL) * TICKS_PER_ROTATION + POS2CNT - POS1CNT) * ANGLE_PER_TICK;
-    /*d = ((newDist - g_Dist_Last) * TICKS_PER_ROTATION + newPOS - g_POS_Last) * DIST_PER_TICK;
+    alpha = ( ((g_DistR - g_DistL) * TICKS_PER_ROTATION + POS2CNT - POS1CNT) * ANGLE_PER_TICK ) % 360000;
+    d = ((newDist - g_Dist_Last) * TICKS_PER_ROTATION + newPOS - g_POS_Last) * DIST_PER_TICK;
 
     dY = (int32_t) d * sin ( (alpha + g_Alpha) / 2 );
     dX = (int32_t) d * cos ( (alpha + g_Alpha) / 2 );
 
     // Really update position
     g_X += dX;
-    g_Y += dY;*/
+    g_Y += dY;
     g_Alpha = alpha;
 
-    /*g_Dist_Last = newDist;
-    g_POS_Last = newPOS;*/
+    g_Dist_Last = newDist;
+    g_POS_Last = newPOS;
 
     // Speed regulation
-    if( g_Loop >= 1000 )
+    if( g_Loop >= 300 )
     {
-        UART_send_32 ( g_Alpha );
-        blockPauseS( 1 );
+        UART_send_32 ( alpha );
 
         // Reset asser loop number
         g_Loop = 0;
 
         // TO DO : distance and angle to target calculation
+        /*distToTarget = sqrt( ( g_Cons_X - g_X ) * ( g_Cons_X - g_X ) + ( g_Cons_Y - G_Y ) * ( g_Cons_Y - G_Y ) );
+        targetAlpha = atan( ( g_Cons_Y - G_Y ) / ( g_Cons_X - g_X ) ); /!\ angle en radian ?
+        if( 0 > g_Cons_X - g_X )
+        {
+            targetAlpha += PI;
+        }*/
+
         targetAlpha = g_Cons_Alpha;
         //commonSpeed = (int16_t) (K_V * distToTarget);
-        commonSpeed = 600;
+        commonSpeed = 800;
         speedCor = (int16_t) ((K_I * (g_RightSpeed - g_LeftSpeed) + K * ((1 + K_D) * (targetAlpha - alpha) - K_D * (targetAlpha - g_Alpha_Last)))/(1 + K_I));
         //UART_send_32 ( speedCor );
 
-        //g_LeftSpeed = commonSpeed - speedCor; //speedRamp( commonSpeed - speedCor, g_LeftSpeed );
-        //g_RightSpeed = commonSpeed  + speedCor; //speedRamp( commonSpeed  + speedCor, g_RightSpeed );
+        g_LeftSpeed = commonSpeed - speedCor; //speedRamp( commonSpeed - speedCor, g_LeftSpeed );
+        g_RightSpeed = commonSpeed  + speedCor; //speedRamp( commonSpeed  + speedCor, g_RightSpeed );
 
         // We just did a correction, so we update g_Alpha_Last
         g_Alpha_Last = alpha;
@@ -85,12 +91,10 @@ unsigned char asser()
     setMotorsSpeed(g_LeftSpeed, g_RightSpeed, MOTOR_MODE_PERCENTAGE );
 
     // TO DO : goal complete return
-    //*
-    /*/if( g_Alpha >= g_Cons_Alpha )
+    if( isFinished() )
         return( DONE_ASSER );
-    else*/
+    else
         return( ASSER_RUNNING );
-    //*/
 }
 
 /*
@@ -158,4 +162,16 @@ int16_t speedRamp( const int16_t targetSpeed, const int16_t previousSpeed )
     }
     else
         return 0;
+}
+
+int isFinished()
+{
+    if( g_Alpha >= g_Cons_Alpha - ANGLE_MARGIN && g_Alpha <= g_Cons_Alpha + ANGLE_MARGIN
+        g_X >= g_Cons_X - DIST_MARGIN && g_X <= g_Cons_X + DIST_MARGIN
+        g_Y >= g_Cons_Y - DIST_MARGIN && g_Y <= g_Cons_Y + DIST_MARGIN )
+    {
+        return 1;
+    }
+
+    return 0;
 }
